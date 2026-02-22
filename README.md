@@ -145,5 +145,6 @@ SmartDoc/
 
 ## 📄 License
 
-MIT License © 2026 [Your Name]
+MIT License © 2026
+
 
