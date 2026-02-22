@@ -40,7 +40,7 @@ h1 {
 """, unsafe_allow_html=True)
 
 
-st.markdown("<h1>🚀 DocuMind AI</h1>", unsafe_allow_html=True)
+st.markdown("<h1>🚀 SmartDoc</h1>", unsafe_allow_html=True)
 
 st.markdown(
     """

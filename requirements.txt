@@ -7,3 +7,5 @@ pypdf
 sentence-transformers
 google-generativeai
 python-dotenv
+pymongo 
+bcrypt

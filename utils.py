@@ -2,52 +2,56 @@ import os
 from dotenv import load_dotenv
 from google import genai
 
-from langchain.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
 
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 DATA_FOLDER = "data"
 
+def create_rag_pipeline(uploaded_file, log_func=None):
 
-def create_rag_pipeline(uploaded_file, log_func):
+    os.makedirs("data", exist_ok=True)
 
-    os.makedirs(DATA_FOLDER, exist_ok=True)
-
-    file_path = os.path.join(DATA_FOLDER, uploaded_file.name)
+    file_path = os.path.join("data", uploaded_file.name)
 
     with open(file_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    log_func("📁 Saved to data folder")
+    if log_func:
+        log_func("📁 File saved to data folder")
 
-    # Load PDF
     loader = PyPDFLoader(file_path)
     documents = loader.load()
-    log_func(f"📖 Extracted {len(documents)} pages")
 
-    # Split text
+    if log_func:
+        log_func(f"📖 Extracted {len(documents)} pages")
+
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=800,
         chunk_overlap=100
     )
     docs = splitter.split_documents(documents)
-    log_func(f"✂ Split into {len(docs)} chunks")
 
-    # Embeddings
+    if log_func:
+        log_func(f"✂ Split into {len(docs)} chunks")
+
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
-    log_func("🔎 Generating Embeddings...")
+
+    if log_func:
+        log_func("🔎 Generating embeddings...")
 
     vectorstore = FAISS.from_documents(docs, embeddings)
-    log_func("🗂 Stored in FAISS Vector Database")
+
+    if log_func:
+        log_func("🗂 Stored in FAISS")
 
     return vectorstore
-
 
 def ask_question(vectorstore, question):
 

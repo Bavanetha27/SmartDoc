@@ -1,0 +1,24 @@
+import streamlit as st
+import bcrypt
+from db import users_collection
+
+st.title("📝 Register")
+
+username = st.text_input("Username")
+email = st.text_input("Email")
+password = st.text_input("Password", type="password")
+
+if st.button("Register"):
+    if users_collection.find_one({"email": email}):
+        st.error("User already exists!")
+    else:
+        hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        
+        users_collection.insert_one({
+            "username": username,
+            "email": email,
+            "password": hashed_pw
+        })
+
+        st.success("Registration Successful!")
+        st.switch_page("pages/2_Login.py")
