@@ -76,7 +76,7 @@ Create a `.env` file:
 
 ```
 GOOGLE_API_KEY=your_google_genai_key
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/smartdoc
+MONGO_URI=mogodb_url
 ```
 
 ### 5. Run the Application
