@@ -2,6 +2,27 @@ import streamlit as st
 import bcrypt
 from db import users_collection
 
+st.set_page_config(
+    page_title="SmartDoc",
+    page_icon="📘",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+st.markdown("""
+<style>
+/* Hide Streamlit default sidebar */
+section[data-testid="stSidebar"] {
+    display: none !important;
+}
+
+/* Remove sidebar collapse button */
+button[kind="header"] {
+    display: none !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 st.title("📝 Register")
 
 username = st.text_input("Username")

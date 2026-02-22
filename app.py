@@ -14,8 +14,6 @@ if "authenticated" not in st.session_state:
 if "vectorstore" not in st.session_state:
     st.session_state.vectorstore = None
 
-
-# ---------------------- DARK SAAS CSS ---------------------- #
 st.markdown("""
 <style>
 
@@ -26,6 +24,17 @@ html, body, [class*="css"] {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+
+/* Hide Streamlit default sidebar */
+section[data-testid="stSidebar"] {
+    display: none !important;
+}
+
+/* Remove sidebar collapse button */
+button[kind="header"] {
+    display: none !important;
+}
+            
 /* Navbar */
 .navbar {
     display: flex;
@@ -121,7 +130,7 @@ html, body, [class*="css"] {
 """, unsafe_allow_html=True)
 
 
-# ---------------------- NAVBAR ---------------------- #
+# NAVBAR #
 
 col1, col2 = st.columns([3,1])
 
@@ -138,7 +147,7 @@ with col2:
             st.switch_page("pages/1_Register.py")
 
 
-# ---------------------- HERO ---------------------- #
+#  HERO  #
 
 st.markdown("""
 <div class="hero">
@@ -158,7 +167,7 @@ with col2:
         st.switch_page("pages/2_Login.py")
 
 
-# ---------------------- FEATURES ---------------------- #
+#  FEATURES  #
 
 st.markdown('<div class="section">', unsafe_allow_html=True)
 st.markdown("## Why SmartDoc?")
@@ -192,7 +201,7 @@ with col3:
 st.markdown('</div>', unsafe_allow_html=True)
 
 
-# ---------------------- CTA ---------------------- #
+#  CTA  #
 
 st.markdown("""
 <div class="cta-box">
@@ -208,7 +217,7 @@ with col2:
         st.switch_page("pages/1_Register.py")
 
 
-# ---------------------- FOOTER ---------------------- #
+#  FOOTER  #
 
 st.markdown("""
 <div class="footer">

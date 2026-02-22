@@ -1,6 +1,34 @@
 import streamlit as st
 from utils import create_rag_pipeline, ask_question
 
+st.set_page_config(
+    page_title="SmartDoc",
+    page_icon="📘",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+st.markdown("""
+<style>
+
+/* Hide multipage navigation */
+[data-testid="stSidebarNav"] {
+    display: none !important;
+}
+
+/* Hide collapse button */
+button[kind="header"] {
+    display: none !important;
+}
+
+/* Hide Streamlit menu + footer */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+
+</style>
+""", unsafe_allow_html=True)
+
 if "authenticated" not in st.session_state or not st.session_state.authenticated:
     st.warning("Please login first.")
     st.switch_page("pages/2_Login.py")
