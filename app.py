@@ -1,40 +1,59 @@
 import streamlit as st
-from utils import create_rag_pipeline
 
 st.set_page_config(
-    page_title="Large Document QA System",
-    layout="wide"
+    page_title="SmartDoc",
+    page_icon="📘",
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
-st.title("📘 Large Document Question Answering System")
-st.markdown("Upload a large PDF and ask questions from it.")
+# Initialize session states
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
 
-# File uploader
-uploaded_file = st.file_uploader("Upload PDF", type=["pdf"])
+if "vectorstore" not in st.session_state:
+    st.session_state.vectorstore = None
 
-if uploaded_file:
 
-    st.success("Document uploaded successfully!")
+# Landing Content
+st.markdown("""
+<style>
+.main {
+    background-color: #0f172a;
+    color: white;
+}
+h1 {
+    text-align: center;
+    color: #38bdf8;
+}
+.stButton>button {
+    background-color: #2563eb;
+    color: white;
+    border-radius: 8px;
+    height: 3em;
+    width: 200px;
+}
+.center {
+    text-align: center;
+}
+</style>
+""", unsafe_allow_html=True)
 
-    # Create RAG pipeline once
-    if "qa_chain" not in st.session_state:
-        with st.spinner("Processing document... Please wait."):
-            try:
-                st.session_state.qa_chain = create_rag_pipeline(uploaded_file)
-                st.success("Document indexed successfully!")
-            except Exception as e:
-                st.error(f"Error: {e}")
 
-    # Question input
-    question = st.text_input("Ask your question")
+st.markdown("<h1>🚀 DocuMind AI</h1>", unsafe_allow_html=True)
 
-    if question:
-        with st.spinner("Generating answer..."):
-            try:
-                response = st.session_state.qa_chain.run(question)
+st.markdown(
+    """
+    <div class="center">
+    <h3>Smart Document Question Answering System</h3>
+    <p>Upload large PDFs and get intelligent answers instantly.</p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-                st.subheader("Answer:")
-                st.write(response)
+col1, col2, col3 = st.columns([1,2,1])
 
-            except Exception as e:
-                st.error(f"Error generating answer: {e}")
+with col2:
+    if st.button("Get Started"):
+        st.switch_page("pages/2_Login.py")

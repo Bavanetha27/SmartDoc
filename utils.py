@@ -1,58 +1,70 @@
 import os
 from dotenv import load_dotenv
+from google import genai
 
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.chains import RetrievalQA
 
-# Load environment variables
 load_dotenv()
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-
-if not GOOGLE_API_KEY:
-    raise ValueError("GOOGLE_API_KEY not found in .env file")
+DATA_FOLDER = "data"
 
 
-def create_rag_pipeline(uploaded_file):
+def create_rag_pipeline(uploaded_file, log_func):
 
-    # Save uploaded file temporarily
-    with open("temp.pdf", "wb") as f:
+    os.makedirs(DATA_FOLDER, exist_ok=True)
+
+    file_path = os.path.join(DATA_FOLDER, uploaded_file.name)
+
+    with open(file_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    # Load PDF
-    loader = PyPDFLoader("temp.pdf")
-    documents = loader.load()
+    log_func("📁 Saved to data folder")
 
-    # Split document into chunks
+    # Load PDF
+    loader = PyPDFLoader(file_path)
+    documents = loader.load()
+    log_func(f"📖 Extracted {len(documents)} pages")
+
+    # Split text
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=800,
         chunk_overlap=100
     )
     docs = splitter.split_documents(documents)
+    log_func(f"✂ Split into {len(docs)} chunks")
 
-    # Create HuggingFace embeddings
+    # Embeddings
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
+    log_func("🔎 Generating Embeddings...")
 
-    # Store in FAISS vector DB
     vectorstore = FAISS.from_documents(docs, embeddings)
+    log_func("🗂 Stored in FAISS Vector Database")
 
-    # Initialize Gemini LLM
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-pro",
-        temperature=0.3,
-        google_api_key=GOOGLE_API_KEY
+    return vectorstore
+
+
+def ask_question(vectorstore, question):
+
+    docs = vectorstore.similarity_search(question, k=3)
+    context = "\n\n".join([doc.page_content for doc in docs])
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=f"""
+        Answer ONLY using the provided context.
+
+        Context:
+        {context}
+
+        Question:
+        {question}
+        """
     )
 
-    # Create RetrievalQA chain
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        retriever=vectorstore.as_retriever()
-    )
-
-    return qa_chain
+    return response.text
